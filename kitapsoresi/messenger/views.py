@@ -3,8 +3,10 @@ from django.shortcuts import render
 
 from messenger.models import Books
 
-#menu = ["Messenger", "My Page", "Search", ...]
+
+# menu = ["Messenger", "My Page", "Search", ...]
 # Create your views here.
+
 def index(request):
     books = Books.objects.all()
     context = {
@@ -12,8 +14,8 @@ def index(request):
         'books': books,
         # 'menu':menu
     }
-    return HttpResponseNotFound('<h1>index page</h1>')
-    # return render(request, 'messenger/index.html', context=context)
+    return render(request, 'messenger/index.html', context=context)
+
 
 def registrationPage(request):
     context = {
