@@ -11,23 +11,22 @@ class Genre(models.Model):
 
 
 class Books(models.Model):
-    name = models.CharField(max_length=255)
-    author = models.CharField(max_length=255)
-    photo = models.ImageField(upload_to="photos/%Y/%m/%d/")
-    description = models.TextField(blank=True)
-    genre = models.ManyToManyField(Genre, help_text="Select a genre for this book")
-    price = models.IntegerField(blank=False)
-    is_published = models.BooleanField(default=True)
-    cat = models.ForeignKey('Category', on_delete=models.PROTECT, null=True)
+    name = models.CharField(max_length=255, verbose_name="Название")
+    author = models.CharField(max_length=255, verbose_name="Автор")
+    photo = models.ImageField(upload_to="photos/%Y/%m/%d/", verbose_name="Фото")
+    description = models.TextField(blank=True, verbose_name="Описание")
+    # genre = models.ManyToManyField(Genre, help_text="Select a genre for this book", verbose_name="Жанр")
+    price = models.IntegerField(blank=False, verbose_name="Цена")
+    is_published = models.BooleanField(default=True, verbose_name="Опубликованность")
 
     def __str__(self):
         return self.name
 
-class Category(models.Model):
-    name = models.CharField(max_length=100, db_index=True)
+    class Meta:
+        verbose_name = 'Имеющиеся книги'
+        verbose_name_plural = 'Имеющиеся книги'
+        ordering = ['name']
 
-    def __str__(self):
-        return self.name
 
 class Friends(models.Model):
     user_id = models.IntegerField(blank=False)  # обязательно к заполнению, заполняется автоматически в бэке
