@@ -8,10 +8,10 @@ from messenger.models import Books
 # Create your views here.
 
 def index(request):
-    # books = Books.objects.all()
+    books = Books.objects.all()
     context = {
         'title': 'General leaf',
-        # 'books': books,
+        'books': books,
         # 'menu':menu
     }
     return render(request, 'messenger/index.html', context=context)
