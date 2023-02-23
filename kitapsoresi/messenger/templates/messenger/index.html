@@ -1,0 +1,29 @@
+{%extends 'messenger/base.html'%}
+{%block content%}
+{%load static%}
+
+<div>
+    <h3>Kitap soresi</h3>
+</div>
+<div class="box">
+    <div class="title">
+        <h1 style="font-size:80px ; font-weight: bold; font-family: inter;">BOOKS FOR ALL</h1>
+        <p>Lorem ipsum — классический текст-«рыба». Является искажённым отрывком из философского трактата Марка Туллия
+            Цицерона «О пределах добра и зла»,</p>
+        <a href="{% url 'registrationPage' %}" class="btn btn-dark"> Регистрация</a><!--register-->
+<!--        <button class="btn btn-dark"> Регистрация</button>-->
+    </div>
+    <div class="image">
+        <img src="{%static 'messenger/images/mainpic.svg'%}" width="90%">
+    </div>
+</div>
+<ul>
+    {%for i in books%}
+    <li>
+        <h2>{{i.title}}</h2>
+        <h2>{{i.author}}</h2>
+        <h2>{{i.content}}</h2>
+    </li>
+    {% endfor %}
+</ul>
+{%endblock%}
