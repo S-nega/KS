@@ -18,10 +18,16 @@ class Books(models.Model):
     genre = models.ManyToManyField(Genre, help_text="Select a genre for this book")
     price = models.IntegerField(blank=False)
     is_published = models.BooleanField(default=True)
+    cat = models.ForeignKey('Category', on_delete=models.PROTECT, null=True)
 
     def __str__(self):
         return self.name
 
+class Category(models.Model):
+    name = models.CharField(max_length=100, db_index=True)
+
+    def __str__(self):
+        return self.name
 
 class Friends(models.Model):
     user_id = models.IntegerField(blank=False)  # обязательно к заполнению, заполняется автоматически в бэке
