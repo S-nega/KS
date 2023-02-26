@@ -1,13 +1,14 @@
 from django.db import models
+from django.urls import reverse
 
 
 # Create your models here.
 
-class Genre(models.Model):
-    name = models.CharField(max_length=200, help_text="Enter a book genre (e.g. Science Fiction, French Poetry etc.)")
-
-    def __str__(self):
-        return self.name
+# class Genre(models.Model):
+#     name = models.CharField(max_length=200, help_text="Enter a book genre (e.g. Science Fiction, French Poetry etc.)")
+#
+#     def __str__(self):
+#         return self.name
 
 
 class Books(models.Model):
@@ -18,15 +19,27 @@ class Books(models.Model):
     # genre = models.ManyToManyField(Genre, help_text="Select a genre for this book", verbose_name="Жанр")
     price = models.IntegerField(blank=False, verbose_name="Цена")
     is_published = models.BooleanField(default=True, verbose_name="Опубликованность")
+    cat = models.ForeignKey('Category', on_delete=models.PROTECT, null=True)
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('post', kwargs={'book_id': self.pk})
 
     class Meta:
         verbose_name = 'Имеющиеся книги'
         verbose_name_plural = 'Имеющиеся книги'
         ordering = ['name']
 
+class Category(models.Model):
+    name = models.CharField(max_length=100, db_index=True)
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('category', kwargs={'cat_id': self.pk})
 
 class Friends(models.Model):
     user_id = models.IntegerField(blank=False)  # обязательно к заполнению, заполняется автоматически в бэке

@@ -1,7 +1,7 @@
-from django.http import HttpResponse, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render
 
-from messenger.models import Books
+from messenger.models import *
 
 
 # menu = ["Messenger", "My Page", "Search", ...]
@@ -9,8 +9,11 @@ from messenger.models import Books
 
 def index(request):
     books = Books.objects.all()
+    cats = Category.objects.all()
     context = {
         'title': 'General leaf',
+        'cats': cats,
+        'cat_selected': 0,
         'books': books,
         # 'menu':menu
     }
@@ -47,3 +50,20 @@ def error404(request, exception):
 def error500(request):
     return HttpResponseNotFound('<h1>Page not found 500</h1>')
     # return render(request, 'messenger/errors/500.html', status=500)
+
+
+def show_category(request, cat_id):
+    books = Books.objects.filter(cat_id=cat_id)
+    cats = Category.objects.all()
+
+    if len(books) == 0:
+        raise Http404()
+
+    context = {
+        'books': books,
+        'cats': cats,
+        'title': 'Category page',
+        'cat_selected': cat_id,
+    }
+    return render(request, 'messenger/index.html', context=context)
+    # return HttpResponse(f"Отображение категории с id = {cat_id}")
