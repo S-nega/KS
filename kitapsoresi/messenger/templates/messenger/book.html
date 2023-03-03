@@ -1,0 +1,17 @@
+{% extends 'messenger/base.html' %}
+
+{% block content %}
+<h1>{{book.name}}</h1>
+<h2>{{book.author}}</h2>
+
+{% if book.photo %}
+<p><img src="{{book.photo.url}}" width="200px"></p>
+{% endif %}
+
+<p>{{book.description}}</p>
+<h3>Рекомендуемая стоимость: {{book.price}} тг</h3>
+
+
+
+{{book.content|linebreaks}}
+{% endblock %}

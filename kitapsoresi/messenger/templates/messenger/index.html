@@ -25,6 +25,7 @@
         <p>{{i.description}}</p>
         <p>Category: {{i.cat}}</p>
         <p><img src="{{i.photo.url}}" width="200px"></p>
+        <a class="btn" href="{{ i.get_absolute_url }}">More Info</a>
     </li>
     {% endfor %}
 </ul>
