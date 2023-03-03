@@ -13,19 +13,20 @@ from django.urls import reverse
 
 class Books(models.Model):
     name = models.CharField(max_length=255, verbose_name="Название")
+    slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="URL")
     author = models.CharField(max_length=255, verbose_name="Автор")
     photo = models.ImageField(upload_to="photos/%Y/%m/%d/", verbose_name="Фото")
     description = models.TextField(blank=True, verbose_name="Описание")
     # genre = models.ManyToManyField(Genre, help_text="Select a genre for this book", verbose_name="Жанр")
     price = models.IntegerField(blank=False, verbose_name="Цена")
     is_published = models.BooleanField(default=True, verbose_name="Опубликованность")
-    cat = models.ForeignKey('Category', on_delete=models.PROTECT, null=True)
+    cat = models.ForeignKey('Category', on_delete=models.PROTECT, verbose_name="Категория (жанр)")
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('post', kwargs={'book_id': self.pk})
+        return reverse('book', kwargs={'book_slug': self.slug})
 
     class Meta:
         verbose_name = 'Имеющиеся книги'
@@ -34,12 +35,18 @@ class Books(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=100, db_index=True)
+    slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="URL")
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('category', kwargs={'cat_id': self.pk})
+        return reverse('category', kwargs={'cat_slug': self.slug})
+
+    class Meta:
+        verbose_name = 'Категории (жанры)'
+        verbose_name_plural = 'Категории (жанры)'
+        ordering = ['name']
 
 class Friends(models.Model):
     user_id = models.IntegerField(blank=False)  # обязательно к заполнению, заполняется автоматически в бэке

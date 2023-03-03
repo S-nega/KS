@@ -1,6 +1,7 @@
 from django.http import HttpResponse, HttpResponseNotFound, Http404
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 
+from messenger.forms import *
 from messenger.models import *
 
 
@@ -9,10 +10,8 @@ from messenger.models import *
 
 def index(request):
     books = Books.objects.all()
-    cats = Category.objects.all()
     context = {
         'title': 'General leaf',
-        'cats': cats,
         'cat_selected': 0,
         'books': books,
         # 'menu':menu
@@ -25,8 +24,29 @@ def registrationPage(request):
         'title': 'Registration Page',
         # 'menu':menu
     }
-    return HttpResponseNotFound('<h1>Reg page</h1>')
-    # return render(request, 'messenger/registrationPage.html', context=context)
+    # return HttpResponseNotFound('<h1>Reg page</h1>')
+    return render(request, 'messenger/registrationPage.html', context=context)
+
+def addBookPage(request):
+    if request.method == 'POST':
+        form = AddBookForm(request.POST)
+        if form.is_valid():
+            # print(form.cleaned_data)
+            try:
+                Books.objects.create(**form.cleaned_data)
+                return redirect('home')
+            except:
+                form.add_error(None, 'Error in adding')
+    else:
+        form = AddBookForm()
+
+    context = {
+        'form': form,
+        'title': 'Add Book Page',
+        # 'menu':menu
+    }
+    # return HttpResponseNotFound('<h1>Reg page</h1>')
+    return render(request, 'messenger/addBookPage.html', context=context)
 
 
 def categories(request, catid):
@@ -51,19 +71,28 @@ def error500(request):
     return HttpResponseNotFound('<h1>Page not found 500</h1>')
     # return render(request, 'messenger/errors/500.html', status=500)
 
+def show_book(request, book_slug):
+    book = get_object_or_404(Books, slug=book_slug)
 
-def show_category(request, cat_id):
-    books = Books.objects.filter(cat_id=cat_id)
-    cats = Category.objects.all()
+    context = {
+        'book': book,
+        # 'menu': menu,
+        'title': book.name,
+        'cat_selected': book.cat_id,
+    }
+
+    return render(request, 'messenger/book.html', context=context)
+def show_category(request, cat_slug):
+    cat = get_object_or_404(Category, slug=cat_slug)
+    books = Books.objects.filter(cat_id=cat.id)
 
     if len(books) == 0:
         raise Http404()
 
     context = {
         'books': books,
-        'cats': cats,
-        'title': 'Category page',
-        'cat_selected': cat_id,
+        'title': cat.name,
+        'cat_selected': cat.id,
     }
     return render(request, 'messenger/index.html', context=context)
     # return HttpResponse(f"Отображение категории с id = {cat_id}")
