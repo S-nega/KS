@@ -1,22 +1,31 @@
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, get_object_or_404, redirect
+from django.urls import reverse_lazy
+from django.views.generic import ListView, DetailView, CreateView
 
 from messenger.forms import *
 from messenger.models import *
 
 
-# menu = ["Messenger", "My Page", "Search", ...]
-# Create your views here.
+menu = [{'title': "О сайте", 'url_name': 'about'},
+        {'title': "Добавить книгу", 'url_name': 'addBookPage'},
+        {'title': "Регистрация", 'url_name': 'login'}]
+        # "Messenger", "My Page", "Search"]
 
-def index(request):
-    books = Books.objects.all()
-    context = {
-        'title': 'General leaf',
-        'cat_selected': 0,
-        'books': books,
-        # 'menu':menu
-    }
-    return render(request, 'messenger/index.html', context=context)
+class MainPage(ListView):
+    model = Books
+    template_name = 'messenger/index.html'
+    context_object_name = 'books'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['menu'] = menu
+        context['title'] = 'Главная страница'
+        context['cat_selected'] = 0
+        return context
+
+    def get_queryset(self):
+        return Books.objects.filter(is_published=True)
 
 
 def registrationPage(request):
@@ -27,26 +36,44 @@ def registrationPage(request):
     # return HttpResponseNotFound('<h1>Reg page</h1>')
     return render(request, 'messenger/registrationPage.html', context=context)
 
-def addBookPage(request):
-    if request.method == 'POST':
-        form = AddBookForm(request.POST)
-        if form.is_valid():
-            # print(form.cleaned_data)
-            try:
-                Books.objects.create(**form.cleaned_data)
-                return redirect('home')
-            except:
-                form.add_error(None, 'Error in adding')
-    else:
-        form = AddBookForm()
+class AddBookPage(CreateView):
+    form_class = AddBookForm
+    template_name = 'messenger/addBookPage.html'
+    success_url = reverse_lazy('home')
 
-    context = {
-        'form': form,
-        'title': 'Add Book Page',
-        # 'menu':menu
-    }
-    # return HttpResponseNotFound('<h1>Reg page</h1>')
-    return render(request, 'messenger/addBookPage.html', context=context)
+    def get_context_data(self, *, objects_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Добавление Книги'
+        context['menu'] = menu
+        return context
+
+class ShowBook(DetailView):
+    model = Books
+    template_name = 'messenger/book.html'
+    slug_url_kwarg = 'book_slug'
+    context_object_name = 'book'
+
+    def get_context_data(self, *, objects_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = context['book']
+        context['menu'] = menu
+        return context
+
+class BooksCategory(ListView):
+    model = Books
+    template_name = 'messenger/index.html'
+    context_object_name = 'books'
+    allow_empty = False
+
+    def get_queryset(self):
+        return Books.objects.filter(cat__slug=self.kwargs['cat_slug'], is_published=True)
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = str(context['books'][0].cat)
+        context['menu'] = menu
+        context['cat_selected'] = context['books'][0].cat_id
+        return context
 
 
 def categories(request, catid):
@@ -70,29 +97,3 @@ def error404(request, exception):
 def error500(request):
     return HttpResponseNotFound('<h1>Page not found 500</h1>')
     # return render(request, 'messenger/errors/500.html', status=500)
-
-def show_book(request, book_slug):
-    book = get_object_or_404(Books, slug=book_slug)
-
-    context = {
-        'book': book,
-        # 'menu': menu,
-        'title': book.name,
-        'cat_selected': book.cat_id,
-    }
-
-    return render(request, 'messenger/book.html', context=context)
-def show_category(request, cat_slug):
-    cat = get_object_or_404(Category, slug=cat_slug)
-    books = Books.objects.filter(cat_id=cat.id)
-
-    if len(books) == 0:
-        raise Http404()
-
-    context = {
-        'books': books,
-        'title': cat.name,
-        'cat_selected': cat.id,
-    }
-    return render(request, 'messenger/index.html', context=context)
-    # return HttpResponse(f"Отображение категории с id = {cat_id}")
