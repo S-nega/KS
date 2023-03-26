@@ -6,13 +6,19 @@ from .models import *
 class AddBookForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['cat'].empty_label = "Категория не выбрана"
+        self.fields['genre'].empty_label = "Жанр не выбран"
+        self.fields['author'].empty_label = "Автор не выбран"
+
     class Meta:
         model = Books
-        fields = ['name', 'slug', 'author', 'photo', 'description', 'is_published', 'cat', 'price']
+        fields = ['name', 'slug', 'description', 'photo', 'author', 'genre', 'price', 'is_published', ]
         widgets = {
-            'name': forms.TextInput(attrs={'class': 'form-input'}),
-            'description': forms.Textarea(attrs={'cols': 60, 'rows': 10}),
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'slug': forms.TextInput(attrs={'class': 'form-control'}),
+            'author': forms.TextInput(attrs={'class': ''}),
+            'description': forms.Textarea(attrs={'class': 'form-control'}),
+            'genre': forms.CheckboxSelectMultiple(attrs={'class': ''}),
+            'price': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
     def clean_name(self):

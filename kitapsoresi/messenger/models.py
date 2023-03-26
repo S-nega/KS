@@ -12,15 +12,14 @@ from django.urls import reverse
 
 
 class Books(models.Model):
-    name = models.CharField(max_length=255, verbose_name="Название")
+    name = models.CharField(max_length=255, verbose_name="Название книги")
     slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="URL")
     author = models.CharField(max_length=255, verbose_name="Автор")
     photo = models.ImageField(upload_to="photos/%Y/%m/%d/", verbose_name="Фото")
     description = models.TextField(blank=True, verbose_name="Описание")
-    # genre = models.ManyToManyField(Genre, help_text="Select a genre for this book", verbose_name="Жанр")
+    genre = models.ManyToManyField('Genre', help_text="Select a genre for this book", verbose_name="Жанр книги")
     price = models.IntegerField(blank=False, verbose_name="Цена")
     is_published = models.BooleanField(default=True, verbose_name="Опубликованность")
-    cat = models.ForeignKey('Category', on_delete=models.PROTECT, verbose_name="Категория (жанр)")
 
     def __str__(self):
         return self.name
@@ -33,20 +32,36 @@ class Books(models.Model):
         verbose_name_plural = 'Имеющиеся книги'
         ordering = ['name']
 
-class Category(models.Model):
-    name = models.CharField(max_length=100, db_index=True)
+class Genre(models.Model):
+    name = models.CharField(max_length=200, help_text="Enter a book genre (e.g. Science Fiction, French Poetry etc.)")
     slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="URL")
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('category', kwargs={'cat_slug': self.slug})
+        return reverse('genre', kwargs={'genre_slug': self.slug})
 
     class Meta:
-        verbose_name = 'Категории (жанры)'
-        verbose_name_plural = 'Категории (жанры)'
+        verbose_name = 'Жанр книги'
+        verbose_name_plural = 'Жанры книг'
         ordering = ['name']
+
+class Author(models.Model):
+    name = models.CharField(max_length=200, help_text="Enter a book Author")
+    slug = models.SlugField(max_length=255, unique=True, db_index=True, verbose_name="URL")
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('author', kwargs={'author_slug': self.slug})
+
+    class Meta:
+        verbose_name = 'Авторы книг'
+        verbose_name_plural = 'Автор книги'
+        ordering = ['name']
+
 
 class Friends(models.Model):
     user_id = models.IntegerField(blank=False)  # обязательно к заполнению, заполняется автоматически в бэке

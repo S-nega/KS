@@ -3,18 +3,28 @@ from messenger.models import *
 
 register = template.Library()
 
-@register.simple_tag(name='getcats')
-def get_categories(filter=None):
+@register.simple_tag(name='getgenre')
+def get_genre(filter=None):
     if not filter:
-        return Category.objects.all()
+        return Genre.objects.all()
     else:
-        return Category.objects.filter(pk=filter)
+        return Genre.objects.filter(pk=filter)
 
-
-@register.inclusion_tag('messenger/list_categories.html')
-def show_categories(sort=None, cat_selected=0):
+@register.inclusion_tag('messenger/tags/list_genres.html')
+def show_genres(sort=None, genre_selected=0):
     if not sort:
-        cats = Category.objects.all()
+        genres = Genre.objects.all()
     else:
-        cats = Category.objects.order_by(sort)
-    return {"cats": cats, "cat_selected": cat_selected}
+        genres = Genre.objects.order_by(sort)
+    return {"genres": genres, "genre_selected": genre_selected}
+
+@register.inclusion_tag('messenger/tags/list_authors.html')
+def show_authors(sort=None, author_selected=0):
+    if not sort:
+        authors = Author.objects.all()
+    else:
+        authors = Author.objects.order_by(sort)
+
+    return {"authors": authors, "author_selected": author_selected}
+
+
