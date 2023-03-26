@@ -1,17 +1,22 @@
 {% extends 'messenger/base.html' %}
 
 {% block content %}
-<h1>{{book.name}}</h1>
-<h2>{{book.author}}</h2>
 
-{% if book.photo %}
-<p><img src="{{book.photo.url}}" width="200px"></p>
-{% endif %}
+<div class="container">
+  <div class="book-block">
+    <div class="book-pic">
+        {% if book.photo %}
+        <img class="book-picture" src="{{book.photo.url}}"  alt="book_photo">
+        {% endif %}
+    </div>
+    <div class="book-info">
+        <h1>{{book.name}}</h1>
+        <h2>{{book.author}}</h2>
+        <p> {{book.description | linebreaks}}</p>
+        <p> {{book.genre}}</p>
+        <h3>Рекомендуемая стоимость: {{book.price}} тг</h3>
+    </div>
+  </div>
+</div>
 
-<p>{{book.description}}</p>
-<h3>Рекомендуемая стоимость: {{book.price}} тг</h3>
-
-
-
-{{book.content|linebreaks}}
 {% endblock %}
