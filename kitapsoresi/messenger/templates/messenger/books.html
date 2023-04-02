@@ -4,12 +4,13 @@
 {% load messenger_tags %}
 
 <div class="container mt-5">
+
+<!--    Filter-->
     <div class="filter-container">
         <div class="filter">
             <h4>Фильтр</h4>
             <hr>
             <h5>По жанрам:</h5>
-
             {% if genre_selected == 0 %}
             <li class="selected"> Все жанры </li>
             {% else %}
@@ -25,11 +26,11 @@
                     {% endif %}
                 {% endif %}
             {% endfor %}
-
 <!--            <h5>По Авторам:</h5>-->
 
-
         </div>
+
+
         <div class="books-list">
             <div class="row row-cols-1 row-cols-md-4 row-cols-lg-5 g-4">
                 {% for i in books %}
@@ -41,6 +42,7 @@
                             <div class="card-body">
                                 <h5 class="card-title">{{i.name}}</h5>
                                 <p class="card-text">{{i.author}}</p>
+<!--                                <p class="card-text">{{i.genre.name}}</p>-->
                             </div>
                             <div class="card-footer">
                                 <a class="btn btn-primary btn-sm " href="{{ i.get_absolute_url }}">читать пост</a>

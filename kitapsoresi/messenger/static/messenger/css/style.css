@@ -4,16 +4,18 @@
     margin-right: auto;
     margin-left: auto;
 }
+
 .card-img-top {
-  max-width: 250px;
-  max-height: 250px;
-  object-fit: cover;
+    max-width: 250px;
+    max-height: 250px;
+    object-fit: cover;
 }
 
 body {
     margin: 0;
     background-color: #fff;
 }
+
 .navbar {
     width: 100%;
     height: 60px;
@@ -38,8 +40,8 @@ body {
 .navbar-menu li a {
     display: inline-block;
     color: #000;
-    opacity: 0.7;+
-    text-decoration: none;
+    opacity: 0.7;
++ text-decoration: none;
     padding: 10px;
     transition: all 0.07s ease-in-out;
 }
@@ -162,21 +164,22 @@ body {
 }
 
 
-
 /*book details*/
 
-.book-block{
+.book-block {
     display: flex;
     justify-content: center;
     /*flex-flow: row wrap;*/
 
 
 }
-.book-pic{
+
+.book-pic {
     height: 500px;
     width: 40%;
 }
-.book-info{
+
+.book-info {
     height: 500px;
     width: 60%;
     padding: 0 0 20px 0;
@@ -185,10 +188,14 @@ body {
     /*background-color: red;*/
 }
 
-.book-picture{
-  max-width: 600px;
-  max-height:600px;
-  object-fit: cover;
+.book-picture {
+    max-width: 600px;
+    max-height: 600px;
+    object-fit: cover;
+}
+
+.pagination{
+    justify-content: center;
 }
 
 
@@ -202,7 +209,7 @@ body {
 
 @media (max-width: 992px) {
 
-    .filter{
+    .filter {
         width: 50%;
     }
 
@@ -212,6 +219,10 @@ body {
 }
 
 @media (max-width: 767px) {
+
+    .about-text {
+        padding-top: 50px;
+    }
 
     .main {
         flex-direction: column;
