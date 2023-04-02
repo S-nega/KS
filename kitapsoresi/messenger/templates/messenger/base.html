@@ -16,49 +16,60 @@
 </head>
 <body class="cont">
 
-    {% block mainmenu %}
-        <div class="header">
-            <ul id="mainmenu" class="mainmenu">
-            <li class="logo">
-                <a href="{% url 'home' %}">
-                    <div class="logo">Kitap Soresi</div>
-                </a>
-            </li>
-            {% for m in menu %}
-                {% if not forloop.last %}
-                        <li><a href="{{ m.url_name }}">{{m.title}}</a></li>
-                {% else %}
-                        <li class="last"><a href="{{ m.url_name }}">{{m.title}}</a></li>
-                {% endif %}
-            {% endfor %}
+    <nav class="navbar">
+        <div class="container">
+        {% block mainmenu %}
+            <div class="navbar-wrap">
+                <ul id="mainmenu" class="navbar-menu">
+                    <li class="logo">
+                        <a href="{% url 'home' %}">
+                            <div class="logo">Kitap Soresi</div>
+                        </a>
+                    </li>
+                    {% for m in menu %}
+                        {% if not forloop.last %}
+                                <li><a href="{{ m.url_name }}">{{m.title}}</a></li>
+                        {% else %}
+                                <li class="last"><a href="{{ m.url_name }}">{{m.title}}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if request.user.is_authenticated %}
+                    <li><a href="{% url 'userPage' %}">{{user.first_name}}</a> | <a href="{% url 'logout' %}">Выйти</a></li>
+                    {% else %}
+                    <li><a href="{% url 'registrationPage' %}">Регистрация</a> | <a href="{% url 'loginPage' %}">Войти</a></li>
+                    {% endif %}
                 </ul>
-                <div class="clear"></div>
-            </div>
-    {% endblock mainmenu %}
+                    <div class="clear"></div>
+                </div>
+        {% endblock mainmenu %}
+        </div>
+    </nav>
+
     {% block content %}
     {% endblock %}
+
     {% if page_obj.has_other_pages %}
-        <nav>
-            <ul>
+        <nav aria-label="Page navigation example" class="container mt-3">
+            <ul class="pagination">
                 {% if page_obj.has_previous %}
-                <li>
-                    <a href="?page={{ page_obj.previous_page_number }}">&lt;</a>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">&lt;</a>
                 </li>
                 {% endif %}
 
                 {% for p in paginator.page_range %}
                     {% if page_obj.number == p %}
-                        <li>{{ p }}</li>
+                        <li class="page-link active">{{ p }}</li>
                     {% elif p >= page_obj.number|add:-2 and p <= page_obj.number|add:2 %}
                         <li>
-                            <a href="?page={{ p }}">{{ p }}</a>
+                            <a class="page-link" href="?page={{ p }}">{{ p }}</a>
                         </li>
                     {% endif %}
                 {% endfor %}
 
                 {% if page_obj.has_next %}
-                <li>
-                    <a href="?page={{ page_obj.next_page_number }}">&gt;</a>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">&gt;</a>
                 </li>
                 {% endif %}
             </ul>

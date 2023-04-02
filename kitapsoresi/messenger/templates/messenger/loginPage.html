@@ -1,17 +1,33 @@
 {% extends 'messenger/base.html' %}
 {%block content%}
-{%load static%}
-{% load messenger_tags %}
+<!--{%load static%}-->
+<div class="container mt-5 col-6 mx-auto">
 
-<div>
-    <h3>Login</h3>
-</div>
-<div class="box">
-    <form>
-        <input type="email" placeholder="email"><br>
-        <input type="password" placeholder="password"><br>
-        <input type="submit" value="Login"><br>
-        <a href="{%url 'registrationPage'%}">Do not have an account?</a>
+    <h1>{{title}}</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        <div>{{ form.non_field_errors }}</div>
+
+        {% for f in form %}
+        <label for="{{ f.id_for_label }}">{{f.label}}: </label>
+        <p>{{ f }}</p>
+        <div>{{ f.errors }}</div>
+        {% endfor %}
+
+        <button type="submit" class="btn btn-warning">Авторизация</button>
     </form>
 </div>
 {%endblock%}
+
+<!--<div>-->
+<!--    <h3>Login</h3>-->
+<!--</div>-->
+<!--<div class="box">-->
+<!--    <form>-->
+<!--        <input type="email" placeholder="email"><br>-->
+<!--        <input type="password" placeholder="password"><br>-->
+<!--        <input type="submit" value="Login"><br>-->
+<!--        <a href="{%url 'registrationPage'%}">Do not have an account?</a>-->
+<!--    </form>-->
+<!--</div>-->
