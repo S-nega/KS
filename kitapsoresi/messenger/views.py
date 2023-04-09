@@ -5,7 +5,7 @@ from django.contrib.auth.views import LoginView
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
-from django.views.generic import ListView, DetailView, CreateView
+from django.views.generic import ListView, DetailView, CreateView, FormView
 
 from messenger.forms import *
 from messenger.models import *
@@ -42,8 +42,25 @@ class AddBookPage(LoginRequiredMixin, DataMixin, CreateView):
         return context
 
 
-# class AccountPage(LoginRequiredMixin):
+class AddCommentPage(LoginRequiredMixin, DataMixin, FormView):
+    form_class = CommentForm
+    template_name = 'messenger/addCommentPage.html'
+    # success_url = reverse_lazy('book')
+    success_url = reverse_lazy('booksPage')
+    login_url = reverse_lazy('login')
+    raise_exception = True
 
+    def get_context_data(self, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title="Оставить комментарий")
+        return dict(list(context.items()) + list(c_def.items()))
+
+    def form_valid(self, form):
+        print(form.cleaned_data)
+        # return redirect('book')
+        return redirect('booksPage')
+
+# class AccountPage(LoginRequiredMixin):
 
 class ShowBook(DataMixin, DetailView):
     model = Books

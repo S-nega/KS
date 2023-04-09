@@ -15,6 +15,9 @@
         <p> {{book.description | linebreaks}}</p>
 <!--        <p> {{book.genre.name}}</p>-->
         <h3>Рекомендуемая стоимость: {{book.price}} тг</h3>
+        {% if request.user.is_authenticated %}
+            <a href="/addCommentPage">Комментировать</a>
+        {% endif %}
     </div>
   </div>
 </div>
