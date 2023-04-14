@@ -37,8 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'debug_toolbar',
     'captcha',
-    'messenger.apps.MessengerConfig'
-
+    'messenger.apps.MessengerConfig',
+     'rest_framework',
 ]
 
 MIDDLEWARE = [
