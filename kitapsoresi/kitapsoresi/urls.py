@@ -25,6 +25,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('captcha', include('captcha.urls')),
     path('', include('messenger.urls')),
+    path('api/v1/bookslist/', BooksAPIView.as_view()),
+    path('api/v1/bookslist/<int:pk>/', BooksAPIView.as_view()),
 ]
 
 if settings.DEBUG:

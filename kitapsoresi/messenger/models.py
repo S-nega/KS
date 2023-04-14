@@ -17,7 +17,7 @@ class Books(models.Model):
     author = models.CharField(max_length=255, verbose_name="Автор")
     photo = models.ImageField(upload_to="photos/%Y/%m/%d/", verbose_name="Фото")
     description = models.TextField(blank=True, verbose_name="Описание")
-    genre = models.ManyToManyField('Genre', help_text="Select a genre for this book", verbose_name="Жанр книги")
+    genre = models.ManyToManyField('Genre', default='не выбрано', help_text="Select a genre for this book", verbose_name="Жанр книги")
     price = models.IntegerField(blank=False, verbose_name="Цена")
     is_published = models.BooleanField(default=True, verbose_name="Опубликованность")
 

@@ -2,13 +2,18 @@ from django.contrib.auth import logout, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
+from django.forms import model_to_dict
 from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, FormView
+from rest_framework import generics
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from messenger.forms import *
 from messenger.models import *
+from .serializers import BooksSerializer
 from .utils import *
 
 class MainPage(DataMixin, ListView):
@@ -244,3 +249,46 @@ def error404(request, exception):
 def error500(request):
     # return HttpResponseNotFound('<h1>Page not found 500</h1>')
     return render(request, 'messenger/errors/500.html', status=500)
+
+
+class BooksAPIView(APIView):
+    def get(self, request):
+        b = Books.objects.all()
+        return Response({'books': BooksSerializer(b, many=True).data})
+    def post(self, request):
+        serializer = BooksSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response({'book': serializer.data})
+
+    def put(self, request, *args, **kwargs):
+        pk = kwargs.get("pk", None)
+        if not pk:
+            return Response({"error": "Method PUT not allowed"})
+        try:
+            instance = Books.objects.get(pk=pk)
+        except:
+            return Response({"error": "Object does not exists"})
+
+        serializer = BooksSerializer(data=request.data, instance=instance)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"post": serializer.data})
+
+    def delete(self, request, *args, **kwargs):
+        pk = kwargs.get("pk", None)
+        if not pk:
+            return Response({"error": "Method DELETE not allowed"})
+        try:
+            instance = Books.objects.get(pk=pk)
+        except:
+            return Response({"error": "Object does not exists"})
+
+        instance.delete()
+
+        return Response({"post": "delete post " + str(pk)})
+
+# class BooksAPIVeiw(generics.ListAPIView):
+#     queryset = Books.objects.all()
+#     serializer_class = BooksSerializer
