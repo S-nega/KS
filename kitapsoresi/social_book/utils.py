@@ -17,7 +17,7 @@ class DataMixin:
     def get_user_context(self, **kwargs):
         context = kwargs
         user_menu = menu.copy()
-        genres = cache.get('genres')
+        # posts = cache.get('posts')
         cache_menu = cache.get('menu')
 
         if not self.request.user.is_authenticated:
@@ -31,18 +31,14 @@ class DataMixin:
         if not cache_menu:
             cache.set('menu', user_menu, 60)
 
-        if not genres:
-            genres = Genre.objects.annotate(Count('books'))
-            cache.set('genres', genres, 60)
-        # authors = Author.objects.annotate(Count('books'))
+        # if not posts:
+        #     posts = Post.objects.annotate
+        #     cache.set('posts', posts, 60)
+        # # authors = Author.objects.annotate(Count('books'))
 
 
         context['menu'] = cache_menu
-        context['genres'] = genres
-        # context['authors'] = authors
-        # context['post'] = post
-        if 'genre_selected' not in context:
-            context['genre_selected'] = 0
-        # if 'author_selected' not in context:
-            # context['author_selected'] = 0
+        context['posts'] = Post.objects.annotate()
+        # if 'genre_selected' not in context:
+        #     context['genre_selected'] = 0
         return context

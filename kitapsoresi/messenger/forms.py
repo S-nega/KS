@@ -38,6 +38,8 @@ class RegisterUserForm(UserCreationForm):
     email = forms.EmailField(label='Email', widget=forms.EmailInput(attrs={'class': 'form-input'}))
     password1 = forms.CharField(label='Пароль', widget=forms.PasswordInput(attrs={'class': 'form-input'}))
     password2 = forms.CharField(label='Повтор пароля', widget=forms.PasswordInput(attrs={'class': 'form-input'}))
+    captcha = CaptchaField()
+
     class Meta:
         model = User
         fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2')
@@ -49,5 +51,5 @@ class LoginUserForm(AuthenticationForm):
 
 
 class CommentForm(forms.Form):
-    comment = forms.CharField(widget=forms.Textarea(attrs={'cols':60, 'rows': 10}))
+    comment = forms.CharField(widget=forms.Textarea(attrs={'cols': 60, 'rows': 10}))
     captcha = CaptchaField()

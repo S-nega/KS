@@ -26,8 +26,9 @@
                     {% endif %}
                 {% endif %}
             {% endfor %}
-<!--            <h5>По Авторам:</h5>-->
 
+<!--            <h5>По Авторам:</h5>-->
+<!--            {% show_authors 'name' author_selected %}-->
         </div>
 
 
@@ -42,10 +43,10 @@
                             <div class="card-body">
                                 <h5 class="card-title">{{i.name}}</h5>
                                 <p class="card-text">{{i.author}}</p>
-<!--                                <p class="card-text">{{i.genre.name}}</p>-->
+                                <p class="card-text">{{genres.i.genre}}</p>
                             </div>
                             <div class="card-footer">
-                                <a class="btn btn-primary btn-sm " href="{{ i.get_absolute_url }}">читать пост</a>
+                                <a class="btn btn-primary btn-sm " href="{{ i.get_absolute_url }}">Подробнее</a>
                             </div>
                         </div>
                     </div>
