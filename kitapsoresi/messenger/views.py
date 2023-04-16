@@ -7,7 +7,7 @@ from django.http import HttpResponse, HttpResponseNotFound, Http404
 from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, FormView
-from rest_framework import generics
+from rest_framework import generics, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -46,12 +46,12 @@ class AddBookPage(LoginRequiredMixin, DataMixin, CreateView):
         context = dict(list(context.items()) + list(c_def.items()))
         return context
 
+# class AccountPage(LoginRequiredMixin):
 
 class AddCommentPage(LoginRequiredMixin, DataMixin, FormView):
     form_class = CommentForm
     template_name = 'messenger/addCommentPage.html'
-    # success_url = reverse_lazy('book')
-    success_url = reverse_lazy('booksPage')
+    success_url = reverse_lazy('feed')
     login_url = reverse_lazy('login')
     raise_exception = True
 
@@ -62,10 +62,9 @@ class AddCommentPage(LoginRequiredMixin, DataMixin, FormView):
 
     def form_valid(self, form):
         print(form.cleaned_data)
-        # return redirect('book')
-        return redirect('booksPage')
+        return redirect('feed')
 
-# class AccountPage(LoginRequiredMixin):
+
 
 class ShowBook(DataMixin, DetailView):
     model = Books
@@ -173,7 +172,7 @@ def index(request):
 
     user_menu = menu.copy()
     if not request.user.is_authenticated:
-        user_menu.pop(2)
+        user_menu.pop(3)
 
     context = {
         'title': 'Main Page',
@@ -202,7 +201,7 @@ def searchPage(request):
 
     user_menu = menu.copy()
     if not request.user.is_authenticated:
-        user_menu.pop(2)
+        user_menu.pop(3)
 
     context = {
         'title': 'Search Page',
@@ -215,7 +214,7 @@ def searchPage(request):
 def about(request):
     user_menu = menu.copy()
     if not request.user.is_authenticated:
-        user_menu.pop(2)
+        user_menu.pop(3)
 
     context = {
         'title': 'About us',
@@ -251,43 +250,65 @@ def error500(request):
     return render(request, 'messenger/errors/500.html', status=500)
 
 
-class BooksAPIView(APIView):
-    def get(self, request):
-        b = Books.objects.all()
-        return Response({'books': BooksSerializer(b, many=True).data})
-    def post(self, request):
-        serializer = BooksSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+# class BooksViewSet(viewsets.ModelViewSet):
+#     queryset = Books.objects.all()
+#     serializer_class = BooksSerializer
 
-        return Response({'book': serializer.data})
 
-    def put(self, request, *args, **kwargs):
-        pk = kwargs.get("pk", None)
-        if not pk:
-            return Response({"error": "Method PUT not allowed"})
-        try:
-            instance = Books.objects.get(pk=pk)
-        except:
-            return Response({"error": "Object does not exists"})
+class BooksAPIList(generics.ListCreateAPIView):
+    queryset = Books.objects.all()
+    serializer_class = BooksSerializer
 
-        serializer = BooksSerializer(data=request.data, instance=instance)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response({"post": serializer.data})
+class BooksAPIUpdate(generics.UpdateAPIView):
+    queryset = Books.objects.all()
+    serializer_class = BooksSerializer
 
-    def delete(self, request, *args, **kwargs):
-        pk = kwargs.get("pk", None)
-        if not pk:
-            return Response({"error": "Method DELETE not allowed"})
-        try:
-            instance = Books.objects.get(pk=pk)
-        except:
-            return Response({"error": "Object does not exists"})
 
-        instance.delete()
+class BooksAPIDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Books.objects.all()
+    serializer_class = BooksSerializer
 
-        return Response({"post": "delete post " + str(pk)})
+
+
+
+#
+# class BooksAPIView(APIView):
+#     def get(self, request):
+#         b = Books.objects.all()
+#         return Response({'books': BooksSerializer(b, many=True).data})
+#     def post(self, request):
+#         serializer = BooksSerializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#
+#         return Response({'book': serializer.data})
+#
+#     def put(self, request, *args, **kwargs):
+#         pk = kwargs.get("pk", None)
+#         if not pk:
+#             return Response({"error": "Method PUT not allowed"})
+#         try:
+#             instance = Books.objects.get(pk=pk)
+#         except:
+#             return Response({"error": "Object does not exists"})
+#
+#         serializer = BooksSerializer(data=request.data, instance=instance)
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#         return Response({"post": serializer.data})
+#
+#     def delete(self, request, *args, **kwargs):
+#         pk = kwargs.get("pk", None)
+#         if not pk:
+#             return Response({"error": "Method DELETE not allowed"})
+#         try:
+#             instance = Books.objects.get(pk=pk)
+#         except:
+#             return Response({"error": "Object does not exists"})
+#
+#         instance.delete()
+#
+#         return Response({"post": "delete post " + str(pk)})
 
 # class BooksAPIVeiw(generics.ListAPIView):
 #     queryset = Books.objects.all()

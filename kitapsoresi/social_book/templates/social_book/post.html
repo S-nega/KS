@@ -1,0 +1,29 @@
+{% extends 'messenger/base.html' %}
+
+{% block content %}
+
+<div class="container">
+  <div class="book-block">
+      <div class="book-info">
+          <h1>{{post.user}}</h1>
+          <p>{{post.created_at}}</p>
+          <p>{{post.caption}}</p>
+
+          {% if request.user.is_authenticated %}
+
+              {% if post.no_of_likes == 0 %}
+                <span class="card-title">No likes</span>
+              {% elif post.no_of_likes == 1 %}
+                <span class="card-title">Liked by {{post.no_of_likes}} person </span>
+              {% else %}
+                <span class="card-title">Liked by {{post.no_of_likes}} people </span>
+              {% endif %}
+
+              <a href="/addCommentPage">Комментировать</a>
+                <!--        ^ в идеале не перебрасывать на другую страницу-->
+          {% endif %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}

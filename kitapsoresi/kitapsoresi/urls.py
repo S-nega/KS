@@ -17,18 +17,28 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
+import messenger
+import social_book
+
 from kitapsoresi import settings
 from messenger.views import *
+from social_book.views import *
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('captcha', include('captcha.urls')),
-    path('', include('messenger.urls')),
-    path('api/v1/bookslist/', BooksAPIView.as_view()),
-    path('api/v1/bookslist/<int:pk>/', BooksAPIView.as_view()),
-]
+    path('main/', include('messenger.urls')),
+    path('', include('social_book.urls')),
 
+    path('api/v1/bookslist/', BooksAPIList.as_view()),
+    path('api/v1/bookslist/<int:pk>/', BooksAPIUpdate.as_view()),
+    path('api/v1/booksdetail/<int:pk>/', BooksAPIDetailView.as_view()),
+
+    path('api/v1/postslist/', PostAPIList.as_view()),
+    path('api/v1/postslist/<int:pk>/', PostAPIUpdate.as_view()),
+    path('api/v1/postsdetail/<int:pk>/', PostAPIDetailView.as_view()),
+]
 if settings.DEBUG:
     import debug_toolbar
 
@@ -36,6 +46,7 @@ if settings.DEBUG:
         path('__debug__/', include(debug_toolbar.urls)),
     ] + urlpatterns
 
+    # urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 handler400 = error400
