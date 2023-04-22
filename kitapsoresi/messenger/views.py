@@ -8,11 +8,13 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, FormView
 from rest_framework import generics, viewsets
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from messenger.forms import *
 from messenger.models import *
+from .permissions import IsAdminOrReadOnly
 from .serializers import BooksSerializer
 from .utils import *
 
@@ -250,66 +252,20 @@ def error500(request):
     return render(request, 'messenger/errors/500.html', status=500)
 
 
-# class BooksViewSet(viewsets.ModelViewSet):
-#     queryset = Books.objects.all()
-#     serializer_class = BooksSerializer
 
-
-class BooksAPIList(generics.ListCreateAPIView):
-    queryset = Books.objects.all()
+class BookViewSet(viewsets.ModelViewSet):
+    # queryset = Books.objects.all()
     serializer_class = BooksSerializer
+    permission_classes = (IsAdminOrReadOnly, )
+    def get_queryset(self):
+        pk = self.kwargs.get("pk")
 
-class BooksAPIUpdate(generics.UpdateAPIView):
-    queryset = Books.objects.all()
-    serializer_class = BooksSerializer
+        if not pk:
+            return Books.objects.all()[:3]
 
+        return Books.objects.filter(pk=pk)
 
-class BooksAPIDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Books.objects.all()
-    serializer_class = BooksSerializer
-
-
-
-
-#
-# class BooksAPIView(APIView):
-#     def get(self, request):
-#         b = Books.objects.all()
-#         return Response({'books': BooksSerializer(b, many=True).data})
-#     def post(self, request):
-#         serializer = BooksSerializer(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-#         serializer.save()
-#
-#         return Response({'book': serializer.data})
-#
-#     def put(self, request, *args, **kwargs):
-#         pk = kwargs.get("pk", None)
-#         if not pk:
-#             return Response({"error": "Method PUT not allowed"})
-#         try:
-#             instance = Books.objects.get(pk=pk)
-#         except:
-#             return Response({"error": "Object does not exists"})
-#
-#         serializer = BooksSerializer(data=request.data, instance=instance)
-#         serializer.is_valid(raise_exception=True)
-#         serializer.save()
-#         return Response({"post": serializer.data})
-#
-#     def delete(self, request, *args, **kwargs):
-#         pk = kwargs.get("pk", None)
-#         if not pk:
-#             return Response({"error": "Method DELETE not allowed"})
-#         try:
-#             instance = Books.objects.get(pk=pk)
-#         except:
-#             return Response({"error": "Object does not exists"})
-#
-#         instance.delete()
-#
-#         return Response({"post": "delete post " + str(pk)})
-
-# class BooksAPIVeiw(generics.ListAPIView):
-#     queryset = Books.objects.all()
-#     serializer_class = BooksSerializer
+    @action(methods=['get'], detail=True)
+    def genre(self, request, pk=None):
+        genres = Genre.objects.get(pk=pk)
+        return Response({'genres': genres.name})

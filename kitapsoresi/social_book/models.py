@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 from django.db import models
 import uuid
 
@@ -7,11 +8,12 @@ from django.urls import reverse
 from datetime import datetime
 
 # Create your models here.
-User = get_user_model()
+# User = get_user_model()
 
 
 class Profile(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, verbose_name='Пользователь', on_delete=models.CASCADE)
+    # user = models.ForeignKey(User, on_delete=models.CASCADE)
     id_user = models.IntegerField()
     bio = models.TextField(blank=True)
     number = models.TextField(blank=True)
@@ -23,8 +25,27 @@ class Profile(models.Model):
         return self.user.username
 
 
+class Friend(models.Model):
+    profile = models.OneToOneField(Profile, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.profile.user.username
+
+
+
+class ChatMessage(models.Model):
+    body = models.TextField()
+    msg_sender = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="msg_sender")
+    msg_receiver = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="msg_receiver")
+    seen = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.body
+
+
 class Post(models.Model):
-    user = models.CharField(max_length=100)
+    # user = models.CharField(max_length=100)
+    user = models.ForeignKey(User, verbose_name='Пользователь', on_delete=models.CASCADE)
     image = models.ImageField(blank=True, upload_to='post_images')
     caption = models.TextField()
     created_at = models.DateTimeField(default=datetime.now)
@@ -46,8 +67,18 @@ class LikePost(models.Model):
 
 class FollowersCount(models.Model):
     follower = models.CharField(max_length=100)
-    user = models.CharField(max_length=100)
+    user = models.ForeignKey(User, verbose_name='Пользователь', on_delete=models.CASCADE)
+    # user = models.CharField(max_length=100)
 
     def __str__(self):
         return self.user
 
+
+class Comment(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
+    commenter_name = models.CharField(max_length=200)
+    comment_body = models.TextField()
+    date_added = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return '%s - %s' % (self.post.caption, self.commenter_name)

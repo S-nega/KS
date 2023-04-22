@@ -3,6 +3,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from captcha.fields import CaptchaField
+from django.forms import ModelForm
 
 from .models import *
 
@@ -26,3 +27,12 @@ from .models import *
 class CommentForm(forms.Form):
     comment = forms.CharField(widget=forms.Textarea(attrs={'cols':60, 'rows': 10}))
     captcha = CaptchaField()
+
+
+
+class ChatMessageForm(ModelForm):
+    body = forms.CharField(widget=forms.Textarea(attrs={"class": "form-control", "rows": "3"}))
+
+    class Meta:
+        model = ChatMessage
+        fields = ["body", ]
