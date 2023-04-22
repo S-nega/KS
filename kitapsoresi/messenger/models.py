@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
 
@@ -20,6 +21,7 @@ class Books(models.Model):
     genre = models.ManyToManyField('Genre', default='не выбрано', help_text="Select a genre for this book", verbose_name="Жанр книги")
     price = models.IntegerField(blank=False, verbose_name="Цена")
     is_published = models.BooleanField(default=True, verbose_name="Опубликованность")
+    user = models.ForeignKey(User, verbose_name='Пользователь', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name

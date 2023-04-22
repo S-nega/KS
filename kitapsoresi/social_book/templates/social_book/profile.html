@@ -12,21 +12,24 @@
                     <div class="rounded-top text-white d-flex flex-row"
                          style="background-color: #E4F64A; height:200px;">
                         <div class="ms-4 mt-5 d-flex flex-column" style="width: 150px;">
-                            <img src="{{user_profile.profileimg.url}}"
+                            <img src="{{profile.profileimg.url}}"
                                  alt="Generic placeholder image" class="img-fluid img-thumbnail mt-4 mb-2"
                                  style="width: 150px; z-index: 1">
-                            {% if user.username == user_profile.user.username %}
+                            {% if user.username == profile.user.username %}
                             <a href="{% url 'Settings' %}" class="btn btn-dark" data-mdb-ripple-color="dark"
                                style="z-index: 1;">
                                 Edit profile
                             </a>
                             {% endif %}
                         </div>
-                        <div class="ms-3 text-dark" style="margin-top: 130px;">
-                            <h5>{{user_profile.user.username}}</h5>
-                            <p>{{user_profile.location}}</p>
+
+                        <div class="ms-3 text-dark" style="margin-top: 100px;">
+                            <h5>{{user}}</h5>
+                            <p>{{user.last_name}} {{user.first_name}}</p>
+                            <p>{{user.location}}</p>
                         </div>
                     </div>
+
                     <div class="p-4 text-black" style="background-color: #f8f9fa;">
                         <div class="d-flex justify-content-end text-center py-1">
                             <div>
@@ -67,11 +70,12 @@
 
                         </div>
                     </div>
+
                     <div class="card-body p-4 text-black">
                         <div class="mb-5">
                             <p class="lead fw-normal mb-1">About</p>
                             <div class="p-4" style="background-color: #f8f9fa;">
-                                <p>{{user_profile.bio}}</p>
+                                <p>{{user.bio}}</p>
                             </div>
                         </div>
                         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -79,7 +83,7 @@
                             <p class="mb-0"><a href="#!" class="text-muted">Show all</a></p>
                         </div>
                         <div class="d-flex justify-content-center row">
-                            {% for post in user_posts reversed%}
+                            {% for post in posts %}
                             <div class="col-8 mb-5">
                                 <div class="card">
                                     <h5 class="px-3 pt-2">@{{post.user}}</h5>

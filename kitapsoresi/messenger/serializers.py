@@ -12,10 +12,11 @@ from messenger.models import Books
 #         self.description = description
 
 class BooksSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(default=serializers.CurrentUserDefault())
     class Meta:
         model = Books
-        # fields = ("name", "slug", "author", "description", "genre", "price", "is_published")
         fields = "__all__"
+        # fields = ("name", "slug", "author", "description", "genre", "price", "is_published")
     # name = serializers.CharField(max_length=255)
     # slug = serializers.SlugField(max_length=255)
     # author = serializers.CharField(max_length=255)

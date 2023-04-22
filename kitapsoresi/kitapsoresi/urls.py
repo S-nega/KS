@@ -21,9 +21,14 @@ import messenger
 import social_book
 
 from kitapsoresi import settings
+s = settings
 from messenger.views import *
 from social_book.views import *
+from rest_framework import routers
 
+router = routers.DefaultRouter()
+router.register(r'book', BookViewSet, basename='book')
+# router.register(r'post', PostViewSet, basename='post')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,23 +36,27 @@ urlpatterns = [
     path('main/', include('messenger.urls')),
     path('', include('social_book.urls')),
 
-    path('api/v1/bookslist/', BooksAPIList.as_view()),
-    path('api/v1/bookslist/<int:pk>/', BooksAPIUpdate.as_view()),
-    path('api/v1/booksdetail/<int:pk>/', BooksAPIDetailView.as_view()),
-
+    path('api/v1/', include(router.urls)),
+    # path('api/v1/bookslist/', BookViewSet.as_view({'get': 'list'})),
+    # path('api/v1/bookslist/<int:pk>/', BookViewSet.as_view({'put': 'update'})),
+    #
     path('api/v1/postslist/', PostAPIList.as_view()),
-    path('api/v1/postslist/<int:pk>/', PostAPIUpdate.as_view()),
-    path('api/v1/postsdetail/<int:pk>/', PostAPIDetailView.as_view()),
+    path('api/v1/postslist/<int:pk>/', PostAPIUpdateDestroy.as_view()),
+    path('api/v1/postslist/d/<int:pk>/', PostAPIDestroy.as_view()),
+    # path('api/v1/postsdetail/<int:pk>/', PostAPIDetailView.as_view()),
 ]
-if settings.DEBUG:
+
+
+if s.DEBUG:
     import debug_toolbar
 
     urlpatterns = [
-        path('__debug__/', include(debug_toolbar.urls)),
-    ] + urlpatterns
+                      path('__debug__/', include(debug_toolbar.urls)),
+                  ] + urlpatterns
 
-    # urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
 
 handler400 = error400
 handler403 = error403
