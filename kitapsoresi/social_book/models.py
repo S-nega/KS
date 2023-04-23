@@ -19,6 +19,7 @@ class Profile(models.Model):
     number = models.TextField(blank=True)
     profileimg = models.ImageField(upload_to='profile_images', default='profile.jpg')
     location = models.CharField(max_length=100, blank=True)
+    # username = models.CharField(max_length=100)
 
     def __str__(self):
         # return self.name
@@ -50,6 +51,7 @@ class Post(models.Model):
     caption = models.TextField()
     created_at = models.DateTimeField(default=datetime.now)
     no_of_likes = models.IntegerField(default=0)
+    # username = models.CharField(max_length=100)
 
     def __str__(self):
         return self.user
@@ -69,6 +71,8 @@ class FollowersCount(models.Model):
     follower = models.CharField(max_length=100)
     user = models.ForeignKey(User, verbose_name='Пользователь', on_delete=models.CASCADE)
     # user = models.CharField(max_length=100)
+    # username = models.CharField(max_length=100)
+
 
     def __str__(self):
         return self.user
@@ -79,6 +83,9 @@ class Comment(models.Model):
     commenter_name = models.CharField(max_length=200)
     comment_body = models.TextField()
     date_added = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, verbose_name='Пользователь', on_delete=models.CASCADE)
+    # username = models.CharField(max_length=100)
 
     def __str__(self):
-        return '%s - %s' % (self.post.caption, self.commenter_name)
+        return self.user
+        # return '%s - %s' % (self.comment_body, self.commenter_name)

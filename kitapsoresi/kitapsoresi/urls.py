@@ -28,6 +28,13 @@ from rest_framework import routers
 
 router = routers.DefaultRouter()
 router.register(r'book', BookViewSet, basename='book')
+router.register(r'genre', GenreViewSet, basename='genre')
+router.register(r'author', AuthorViewSet, basename='author')
+
+router.register(r'profile', ProfileViewSet, basename='profile')
+# router.register(r'comment', CommentViewSet, basename='comment')
+router.register(r'follower', FollowerViewSet, basename='follower')
+router.register(r'likepost', LikePostViewSet, basename='likepost')
 # router.register(r'post', PostViewSet, basename='post')
 
 urlpatterns = [
@@ -40,10 +47,37 @@ urlpatterns = [
     # path('api/v1/bookslist/', BookViewSet.as_view({'get': 'list'})),
     # path('api/v1/bookslist/<int:pk>/', BookViewSet.as_view({'put': 'update'})),
     #
+
+    path('api/v1/commentlist/', CommentViewSet.as_view({'get': 'list'})),
+    # path('api/v1/commentlist/<int:pk>/', CommentViewSet.as_view({'put': 'update'})),
+
+    # path('api/v1/commentlist/', CommentAPIList.as_view()),
+    # path('api/v1/commentlist/<int:pk>/', CommentAPIUpdateDestroy.as_view()),
+    path('api/v1/commentlist/d/<int:pk>/', CommentAPIDestroy.as_view()),  # работатет только destroy
+
     path('api/v1/postslist/', PostAPIList.as_view()),
     path('api/v1/postslist/<int:pk>/', PostAPIUpdateDestroy.as_view()),
     path('api/v1/postslist/d/<int:pk>/', PostAPIDestroy.as_view()),
     # path('api/v1/postsdetail/<int:pk>/', PostAPIDetailView.as_view()),
+
+    #
+    # path('api/v1/profilelist/', ProfileAPIView.as_view()),
+    # path('api/v1/profilelist/<int:pk>/', ProfileAPIView.as_view()),
+
+    # path('api/v1/commentlist/', CommentAPIView.as_view()),
+    # path('api/v1/commentlist/<int:pk>/', CommentAPIView.as_view()),
+
+    # path('api/v1/followerlist/', FollowersCountAPIView.as_view()),
+    # path('api/v1/followerlist/<int:pk>/', FollowersCountAPIView.as_view()),
+    # path('api/v1/likepostlist/', LikePostAPIView.as_view()),
+    # path('api/v1/likepostlist/<int:pk>/', LikePostAPIView.as_view()),
+
+    # path('api/v1/bookslist/', BooksAPIView.as_view()),
+    # path('api/v1/bookslist/<int:pk>/', BooksAPIView.as_view()),
+    # path('api/v1/genrelist/', GenreAPIView.as_view()),
+    # path('api/v1/genrelist/<int:pk>/', GenreAPIView.as_view()),
+    # path('api/v1/authorlist/', AuthorAPIView.as_view()),
+    # path('api/v1/authorlist/<int:pk>/', AuthorAPIView.as_view()),
 ]
 
 

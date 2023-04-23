@@ -14,7 +14,7 @@ class AddBookForm(forms.ModelForm):
 
     class Meta:
         model = Books
-        fields = ['name', 'slug', 'description', 'photo', 'author', 'genre', 'price', 'is_published', ]
+        fields = ['name', 'slug', 'description', 'photo', 'author', 'genre', 'price', 'is_published', 'user']
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'slug': forms.TextInput(attrs={'class': 'form-control'}),
@@ -22,12 +22,13 @@ class AddBookForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'class': 'form-control'}),
             'genre': forms.CheckboxSelectMultiple(attrs={'class': ''}),
             'price': forms.TextInput(attrs={'class': 'form-control'}),
+            # 'user': forms.TextInput(attrs={'class': ''}),
         }
 
     def clean_name(self):
         name = self.cleaned_data['name']
-        if len(name) > 200:
-            raise ValidationError('Длинна превышает 200 символов')
+        if len(name) > 100:
+            raise ValidationError('Длинна превышает 100 символов')
         return name
 
 
@@ -45,7 +46,7 @@ class RegisterUserForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2')
+        fields = ('username', 'first_name', 'last_name', 'email', 'number', 'location', 'bio', 'password1', 'password2')
 
 
 class LoginUserForm(AuthenticationForm):
