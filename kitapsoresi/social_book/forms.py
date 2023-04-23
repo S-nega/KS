@@ -25,7 +25,7 @@ from .models import *
 #
 
 class CommentForm(forms.Form):
-    comment = forms.CharField(widget=forms.Textarea(attrs={'cols':60, 'rows': 10}))
+    comment = forms.CharField(widget=forms.Textarea(attrs={'cols': 60, 'rows': 10}))
     captcha = CaptchaField()
 
 

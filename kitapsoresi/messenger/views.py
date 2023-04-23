@@ -15,7 +15,7 @@ from rest_framework.views import APIView
 from messenger.forms import *
 from messenger.models import *
 from .permissions import IsAdminOrReadOnly
-from .serializers import BooksSerializer
+from .serializers import BooksSerializer, AuthorSerializer, GenreSerializer
 from .utils import *
 
 class MainPage(DataMixin, ListView):
@@ -174,7 +174,8 @@ def index(request):
 
     user_menu = menu.copy()
     if not request.user.is_authenticated:
-        user_menu.pop(3)
+        del user_menu[1:3]
+
 
     context = {
         'title': 'Main Page',
@@ -203,7 +204,7 @@ def searchPage(request):
 
     user_menu = menu.copy()
     if not request.user.is_authenticated:
-        user_menu.pop(3)
+        del user_menu[1:3]
 
     context = {
         'title': 'Search Page',
@@ -216,7 +217,7 @@ def searchPage(request):
 def about(request):
     user_menu = menu.copy()
     if not request.user.is_authenticated:
-        user_menu.pop(3)
+        del user_menu[1:3]
 
     context = {
         'title': 'About us',
@@ -224,12 +225,13 @@ def about(request):
     }
     return render(request, 'messenger/about.html', context=context)
 
-def userPage(request):
-    context = {
-        'title': 'Account',
-        'menu': menu,
-    }
-    return render(request, 'messenger/userPage.html', context=context)
+#
+# def userPage(request):
+#     context = {
+#         'title': 'Account',
+#         'menu': menu,
+#     }
+#     return render(request, 'messenger/userPage.html', context=context)
 
 
 def error400(request, exception):
@@ -269,3 +271,152 @@ class BookViewSet(viewsets.ModelViewSet):
     def genre(self, request, pk=None):
         genres = Genre.objects.get(pk=pk)
         return Response({'genres': genres.name})
+
+
+class GenreViewSet(viewsets.ModelViewSet):
+    serializer_class = GenreSerializer
+    permission_classes = (IsAdminOrReadOnly, )
+    def get_queryset(self):
+        pk = self.kwargs.get("pk")
+
+        if not pk:
+            return Genre.objects.all()[:3]
+
+        return Genre.objects.filter(pk=pk)
+
+
+class AuthorViewSet(viewsets.ModelViewSet):
+    serializer_class = AuthorSerializer
+    permission_classes = (IsAdminOrReadOnly,)
+
+    def get_queryset(self):
+        pk = self.kwargs.get("pk")
+
+        if not pk:
+            return Author.objects.all()[:3]
+
+        return Author.objects.filter(pk=pk)
+
+
+#
+# class BooksAPIView(APIView):
+#     def get(self, request):
+#         p = Books.objects.all()
+#         return Response({'books': BooksSerializer(p, many=True).data})
+#
+#     def post(self, request):
+#         serializer = BooksSerializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#
+#         return Response({'books': serializer.data})
+#
+#     def put(self, request, *args, **kwargs):
+#         pk = kwargs.get("pk", None)
+#         if not pk:
+#             return Response({"error": "Method put not allowed"})
+#
+#         try:
+#             instance = Books.objects.get(pk=pk)
+#         except:
+#             return Response({"error": "oBject doesnt not exists"})
+#
+#         serializer = BooksSerializer(data=request.data, instance=instance)
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#         return Response({"books": serializer.data})
+#
+#     def delete(self, request, *args, **kwargs):
+#         pk = kwargs.get("pk", None)
+#         if not pk:
+#             return Response({"error": "Method DELETE not allowed"})
+#
+#         try:
+#             record = Books.objects.get(pk=pk)
+#             record.delete()
+#         except:
+#             return Response({"error": "Object does not exists"})
+#
+#         return Response({"books": "delete post " + str(pk)})
+#
+#
+# class GenreAPIView(APIView):
+#     def get(self, request):
+#         p = Genre.objects.all()
+#         return Response({'genre': GenreSerializer(p, many=True).data})
+#
+#     def post(self, request):
+#         serializer = GenreSerializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#
+#         return Response({'genre': serializer.data})
+#
+#     def put(self, request, *args, **kwargs):
+#         pk = kwargs.get("pk", None)
+#         if not pk:
+#             return Response({"error": "Method put not allowed"})
+#
+#         try:
+#             instance = Genre.objects.get(pk=pk)
+#         except:
+#             return Response({"error": "oBject doesnt not exists"})
+#
+#         serializer = GenreSerializer(data=request.data, instance=instance)
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#         return Response({"genre": serializer.data})
+#
+#     def delete(self, request, *args, **kwargs):
+#         pk = kwargs.get("pk", None)
+#         if not pk:
+#             return Response({"error": "Method DELETE not allowed"})
+#
+#         try:
+#             record = Genre.objects.get(pk=pk)
+#             record.delete()
+#         except:
+#             return Response({"error": "Object does not exists"})
+#
+#         return Response({"genre": "delete post " + str(pk)})
+#
+#
+# class AuthorAPIView(APIView):
+#     def get(self, request):
+#         p =  Author.objects.all()
+#         return Response({'author': AuthorSerializer(p, many=True).data})
+#
+#     def post(self, request):
+#         serializer = AuthorSerializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#
+#         return Response({'author': serializer.data})
+#
+#     def put(self, request, *args, **kwargs):
+#         pk = kwargs.get("pk", None)
+#         if not pk:
+#             return Response({"error": "Method put not allowed"})
+#
+#         try:
+#             instance = Author.objects.get(pk=pk)
+#         except:
+#             return Response({"error": "oBject doesnt not exists"})
+#
+#         serializer = AuthorSerializer(data=request.data, instance=instance)
+#         serializer.is_valid(raise_exception=True)
+#         serializer.save()
+#         return Response({"author": serializer.data})
+#
+#     def delete(self, request, *args, **kwargs):
+#         pk = kwargs.get("pk", None)
+#         if not pk:
+#             return Response({"error": "Method DELETE not allowed"})
+#
+#         try:
+#             record = Author.objects.get(pk=pk)
+#             record.delete()
+#         except:
+#             return Response({"error": "Object does not exists"})
+#
+#         return Response({"author": "delete post " + str(pk)})

@@ -5,9 +5,9 @@ from .models import *
 
 menu = [
     {'title': "Книги", 'url_name': '/main/books'},
+    {'title': "Добавить книгу", 'url_name': '/main/addBookPage'},
     {'title': "Новости", 'url_name': '/'},
     {'title': "Поисковик", 'url_name': '/main/searchPage'},
-    {'title': "Добавить книгу", 'url_name': '/main/addBookPage'},
     {'title': "О нас", 'url_name': '/main/about'},
     # {'title': "Главная", 'url_name': '/main'},
 ]
@@ -21,7 +21,7 @@ class DataMixin:
         cache_menu = cache.get('menu')
 
         if not self.request.user.is_authenticated:
-            user_menu.pop(3)
+            del user_menu[1:3]
             cache.set('menu', user_menu, 60)
 
         if self.request.user.is_authenticated:

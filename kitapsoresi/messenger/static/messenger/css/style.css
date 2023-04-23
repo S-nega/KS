@@ -285,6 +285,46 @@ body {
 }
 
 
+
+.chat-messenger {
+    display: flex;
+    justify-content: center;
+}
+
+.chat-info {
+    width: 60%;
+    margin-right: 20px;
+}
+
+.chat-box {
+    width: 40%;
+    height: 100px;
+    margin-left: 20px;
+}
+
+
+.chat-box-received, .chat-box-sent {
+    width: 200px;
+    height: auto;
+    font-size: 14px;
+    background-color: slateblue;
+    color: white;
+    margin-left: auto;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    padding: 10px 10px;
+    border-radius: 10px;
+}
+
+.chat-box-sent {
+    background-color: rebeccapurple;
+    color: white;
+    float: left;
+
+}
+
+
 .navbar .container #navbarSupportedContent{
     justify-content: space-between;
 }
