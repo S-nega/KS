@@ -157,8 +157,6 @@ def friend(request, pk):
             return redirect("friend", pk=friend.profile.id)
 
 
-
-
     context = {
         "friend": friend,
         "form": form,
@@ -500,13 +498,15 @@ def follow(request):
         if FollowersCount.objects.filter(follower=follower, user=user).first():
             delete_follower = FollowersCount.objects.get(follower=follower, user=user)
             delete_follower.delete()
-            return redirect('/profile/' + user)
+            button_text = 'Отписаться'
+            return redirect('/profile/' + user, button_text=button_text)
         else:
             new_follower = FollowersCount.objects.create(follower=follower, user=user)
             new_follower.save()
-            return redirect('/profile/' + user)
+            button_text = 'Подписаться'
+            return redirect('/profile/' + user,  button_text=button_text)
     else:
-        return render(request, 'social_book/profile.html', )
+        return render(request, 'social_book/profile.html',)
 
 
 @login_required(login_url='signin')

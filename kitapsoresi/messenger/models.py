@@ -78,28 +78,48 @@ class News(models.Model):
     bookId = models.IntegerField(blank=True)  # не обязательно к заполнению
     saveStatus = models.BooleanField(default=False)
 
-
-class StarList(models.Model):
-    user_id = models.IntegerField()
-    post_id = models.IntegerField(blank=True)  # не обязательно к заполнению, заполняется автоматически в бэке
-    book_id = models.IntegerField(blank=True)  # не обязательно к заполнению, заполняется автоматически в бэке
+#
+# class StarList(models.Model):
+#     user_id = models.IntegerField()
+#     post_id = models.IntegerField(blank=True)  # не обязательно к заполнению, заполняется автоматически в бэке
+#     book_id = models.IntegerField(blank=True)  # не обязательно к заполнению, заполняется автоматически в бэке
 
 
 class WishList(models.Model):
-    user_id = models.IntegerField()
-    book_id = models.IntegerField()
-    comment = models.TextField(blank=True)
+    user = models.ForeignKey(User, verbose_name='Пользователь', on_delete=models.CASCADE)
+    book_slug = models.SlugField(max_length=255, verbose_name="book_URL")
+
+    # book_slug = models.S(Books, verbose_name='book_slug', on_delete=models.CASCADE)
+    # book = models.ForeignKey(Books, verbose_name="Книги", on_delete=models.CASCADE)
+    # comment = models.TextField(blank=True)
+    # price = models.IntegerField(blank=False)
+    # user_id = models.IntegerField()
+    # book_id = models.IntegerField()
+    # comment = models.TextField(blank=True)
+
+    def __str__(self):
+        return self.book_slug
+
+    def get_absolute_url(self):
+        return reverse('book', kwargs={'book_slug': self.book_slug})
 
 
-class Messages(models.Model):
-    author_id = models.IntegerField()
-    reader_id = models.IntegerField()
-    time_create = models.DateTimeField(auto_now_add=True)
-    time_update = models.DateTimeField(auto_now=True)
+#
+# class Messages(models.Model):
+#     author_id = models.IntegerField()
+#     reader_id = models.IntegerField()
+#     time_create = models.DateTimeField(auto_now_add=True)
+#     time_update = models.DateTimeField(auto_now=True)
 
-
-class UserLib(models.Model):
-    user_id = models.IntegerField()
-    book_id = models.IntegerField()
-    comment = models.TextField(blank=True)
-    price = models.IntegerField(blank=False)
+#
+# class UserLib(models.Model):
+#     user = models.ForeignKey(User, verbose_name='Пользователь', on_delete=models.CASCADE)
+#     book = models.ForeignKey(Books, verbose_name="Книги", on_delete=models.CASCADE)
+#     comment = models.TextField(blank=True)
+#     price = models.IntegerField(blank=False)
+#
+#     def __str__(self):
+#         return self.book
+#
+#     def get_absolute_url(self):
+#         return reverse('book', kwargs={'book_slug': self.slug})
