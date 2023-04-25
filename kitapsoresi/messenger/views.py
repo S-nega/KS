@@ -33,6 +33,25 @@ class MainPage(DataMixin, ListView):
         return Books.objects.filter(is_published=True).prefetch_related('genre')
 
 
+class UserBooksPage(LoginRequiredMixin, DataMixin, ListView):
+    model = Books
+    template_name = 'messenger/user_books.html'
+    # user = 'user'
+    # slug_url_kwarg = 'user'
+    context_object_name = 'books'
+
+    def get_queryset(self):
+        # print(self.kwargs['user'])
+        us_id = User.objects.get(username=self.kwargs['user'])
+        # return UserLib.objects.filter(user=self.request.user)
+        return Books.objects.filter(user=us_id)
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title="Книги")
+        context = dict(list(context.items()) + list(c_def.items()))
+        return context
+
 
 class AddBookPage(LoginRequiredMixin, DataMixin, CreateView):
     form_class = AddBookForm
@@ -48,7 +67,52 @@ class AddBookPage(LoginRequiredMixin, DataMixin, CreateView):
         context = dict(list(context.items()) + list(c_def.items()))
         return context
 
-# class AccountPage(LoginRequiredMixin):
+
+# class AddBookToWishList(LoginRequiredMixin, DataMixin, CreateView):
+#     model = WishList
+#     context_object_name = 'links'
+
+
+@login_required(login_url='signin')
+def addToWishList(request):
+    if request.method == 'POST':
+        user = request.POST['user']
+        user_id = User.objects.get(username=user)
+        my_user_id = user_id.pk
+        book_slug = request.POST['book_slug']
+        print('my_data: ', user, user_id, book_slug)
+
+        if WishList.objects.filter(user=user_id, book_slug=book_slug).first():
+            delete_wish = WishList.objects.get(user=user_id, book_slug=book_slug)
+            delete_wish.delete()
+            return redirect('/main/wishListPage/1' + user)
+        else:
+            new_wish = WishList.objects.create(user=user_id, book_slug=book_slug)
+            new_wish.save()
+            return redirect('/main/wishListPage/' + user)
+    else:
+        return render(request, 'messenger/user_wishList.html', )
+
+
+class WishListPage(LoginRequiredMixin, DataMixin, ListView):
+    model = WishList
+    template_name = 'messenger/user_wishList.html'
+    # user = 'user'
+    # slug_url_kwarg = 'user'
+    context_object_name = 'wish_list'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        c_def = self.get_user_context(title="Желаемые Книги")
+        context = dict(list(context.items()) + list(c_def.items()))
+        return context
+
+    def get_queryset(self):
+        # print(self.kwargs['user'])
+        us_id = User.objects.get(username=self.kwargs['user'])
+        return WishList.objects.filter(user=us_id)
+
+
 
 class AddCommentPage(LoginRequiredMixin, DataMixin, FormView):
     form_class = CommentForm
@@ -73,12 +137,18 @@ class ShowBook(DataMixin, DetailView):
     template_name = 'messenger/book.html'
     slug_url_kwarg = 'book_slug'
     context_object_name = 'book'
+    # button_text = 'Добавить в виш-лист'
 
     def get_context_data(self, *, objects_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title=context['book'])
         context = dict(list(context.items()) + list(c_def.items()))
         return context
+
+    # def get_queryset(self):
+    #     if WishList.objects.get(user=self.request.user, book_slug=self.kwargs['book_slug']):
+    #         button_text = 'Удалить из виш-листа'
+    #     return button_text
 
 
 class BooksGenre(DataMixin, ListView):

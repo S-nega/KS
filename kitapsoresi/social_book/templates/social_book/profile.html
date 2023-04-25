@@ -20,11 +20,20 @@
                             </a>
                             {% endif %}
                             {% if user.username != user_profile.user.username %}
-                            <a href="{% url 'friend' user_profile.id %}" class="btn btn-outline-dark" data-mdb-ripple-color="dark"
+                            <a href="{% url 'friend' user.id %}" class="btn btn-outline-dark" data-mdb-ripple-color="dark"
                                style="z-index: 1;">
                                 Send Message
                             </a>
                             {% endif %}
+                            <br>
+                            <a href="{% url 'userBooksPage' user_profile.user %}" class="btn btn-dark" data-mdb-ripple-color="dark" style="z-index: 1;">
+                                Библиотека {{user_profile.user}}
+<!--                                {{user_profile.user.id}}-->
+                            </a>
+                            <br>
+                            <a href="{% url 'wishListPage' user_profile.user %}" class="btn btn-dark" data-mdb-ripple-color="dark" style="z-index: 1;">
+                                Виш-лист
+                            </a>
                         </div>
                         <div class="ms-3 text-dark" style="margin-top: 100px;">
                             <h5>{{user_profile.user.username}}</h5>
@@ -65,7 +74,7 @@
                                     {% csrf_token %}
                                     <input type="hidden" value="{{user.username}}" name="follower"/>
                                     <input type="hidden" value="{{user_object.username}}" name="user"/>
-                                    <button type="submit" class="btn {{button_style}}  mt-1">{{button_text}}</button>
+                                    <button type="submit" class="btn {{button_style}}  mt-1">{{button_text}} follow </button>
                                 </form>
                             </div>
                             {% endif %}

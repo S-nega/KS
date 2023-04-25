@@ -1,0 +1,42 @@
+{% extends 'messenger/base.html' %}
+{% block content %}
+{% load static %}
+{% load messenger_tags %}
+
+<div class="container mt-5">
+
+        <div class="books-list">
+            <div class="row row-cols-1 row-cols-md-4 row-cols-lg-5 g-4">
+                {% for b in books_list %}
+<!--                    {% if wish_list == Null %}-->
+<!--                            <h3>You don't have wish-books yet</h3>-->
+<!--                    {% endif %}-->
+                    {% for w in wish_list %}
+                        {% if b.slug == w.book_slug %}
+                            <div class="col-6 col-md-6 col-lg-3">
+                                <div class="card h-100">
+                                    {% if b.photo %}
+                                        <img src="{{b.photo.url}}" class="card-img-top" alt="...">
+                                    {% endif %}
+
+                                    <div class="card-body">
+                                        <p>{{b.name}}</p>
+                                        <p>{{b.slug}}</p>
+                                        <p>{{b.price}}</p>
+                                        <p>{{b.author}}</p>
+                                    </div>
+
+                                    <div class="card-footer">
+                                        <a class="btn btn-primary btn-sm " href="{{ b.get_absolute_url }}">Подробнее</a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{%endblock%}

@@ -31,7 +31,6 @@
 <!--            {% show_authors 'name' author_selected %}-->
         </div>
 
-
         <div class="books-list">
             <div class="row row-cols-1 row-cols-md-4 row-cols-lg-5 g-4">
                 {% for i in books %}
@@ -45,6 +44,7 @@
                                 <p class="card-text">{{i.author}}</p>
                                 <p class="card-text">{{genres.i.genre}}</p>
                                 <p class="card-text">{{i.user}}</p>
+                                <p class="card-text">{{i.book}}</p>
                             </div>
                             <div class="card-footer">
                                 <a class="btn btn-primary btn-sm " href="{{ i.get_absolute_url }}">Подробнее</a>
