@@ -14,6 +14,7 @@ from django.views.generic import ListView, FormView, DetailView
 from itertools import chain
 from rest_framework import generics, viewsets
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -24,10 +25,17 @@ from social_book.models import *
 from social_book.serializers import *
 from .utils import *
 
+
+class PostAPIPagination(PageNumberPagination):
+    page_size = 5
+    page_size_query_param = 'page_size'
+    max_page_size = 10000
+
 class PostAPIList(generics.ListCreateAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = (IsAuthenticated, )
+    pagination_class = PostAPIPagination
 
 class PostAPIUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     queryset = Post.objects.all()
@@ -450,61 +458,50 @@ def deletepost(request):
 @login_required(login_url='signin')
 def profile(request, user):
     user_object = User.objects.get(username=user)
-    print(user)
     user_profile = Profile.objects.get(user=user_object)
-    # user = User.objects.get(username=user_object)
+    print("data: ", request.user, user, user_profile.id_user)
     user_menu = menu.copy()
-    # user_posts = Post.objects.get(user=user)
-    # user_posts_length = len(user_posts)
 
     if not request.user.is_authenticated:
         user_menu.pop(3)
 
     follower = request.user.username
-    user = user
-    #
-    # if FollowersCount.objects.get(follower=follower, user=user).first():
-    #     button_text = 'Unfollow'
-    #     button_style = 'btn-danger'
-    # else:
-    #     button_text = 'Follow'
-    #     button_style = 'btn-outline-danger'
-
-    # user_followers = len(FollowersCount.objects.get(user=user))
-    # user_following = len(FollowersCount.objects.get(follower=user))
 
     context = {
         'user_object': user_object,
         'user_profile': user_profile,
-        # 'user': user,
         'menu': user_menu,
-        # 'user_posts': user_posts,
-        # 'user_posts_length': user_posts_length,
-        # 'button_text': button_text,
-        # 'button_style': button_style,
-        # 'user_followers': user_followers,
-        # 'user_following': user_following,
+        'button_text': "Подписаться"
     }
-
+    print(user_profile.user_id, request.user)
+    try:
+        if FollowersCount.objects.get(user=user_profile.user_id, follower=request.user):
+            print('1')
+            context['button_text'] = "Отписаться"
+        else:
+            print('2')
+            context['button_text'] = "Подписаться"
+    except FollowersCount.DoesNotExist:
+        print('3')
+        context['button_text'] = "Подписаться"
     return render(request, 'social_book/profile.html', context=context)
 
 
 @login_required(login_url='signin')
 def follow(request):
     if request.method == 'POST':
-        follower = request.POST['follower']
         user = request.POST['user']
+        user_id = User.objects.get(username=user)
+        follower = request.POST['follower']
 
-        if FollowersCount.objects.filter(follower=follower, user=user).first():
-            delete_follower = FollowersCount.objects.get(follower=follower, user=user)
+        if FollowersCount.objects.filter(follower=follower, user=user_id).first():
+            delete_follower = FollowersCount.objects.get(follower=follower, user=user_id)
             delete_follower.delete()
-            button_text = 'Отписаться'
-            return redirect('/profile/' + user, button_text=button_text)
+            return redirect('/profile/' + user)
         else:
-            new_follower = FollowersCount.objects.create(follower=follower, user=user)
+            new_follower = FollowersCount.objects.create(follower=follower, user=user_id)
             new_follower.save()
-            button_text = 'Подписаться'
-            return redirect('/profile/' + user,  button_text=button_text)
+        return redirect('/profile/' + user)
     else:
         return render(request, 'social_book/profile.html',)
 
@@ -532,16 +529,7 @@ def search(request):
     return render(request, 'social_book/search.html',
                   {'user_profile': user_profile, 'username_profile_list': username_profile_list})
 
-#
-# def post(request, pk):
-#     post_detail = Post.objects.get(id=pk)
-#
-#     context = {
-#         'post': post_detail,
-#     }
-#
-#     return render(request, 'social_book/post.html', context)
-#
+
 
 def addcomment(request):
     if request.method == 'POST':
@@ -785,7 +773,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
         pk = self.kwargs.get("pk")
 
         if not pk:
-            return Profile.objects.all()[:3]
+            return Profile.objects.all()
 
         return Profile.objects.filter(pk=pk)
 
@@ -796,7 +784,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         pk = self.kwargs.get("pk")
 
         if not pk:
-            return Comment.objects.all()[:3]
+            return Comment.objects.all()
 
         return Comment.objects.filter(pk=pk)
 
@@ -808,7 +796,7 @@ class FollowerViewSet(viewsets.ModelViewSet):
         pk = self.kwargs.get("pk")
 
         if not pk:
-            return FollowersCount.objects.all()[:3]
+            return FollowersCount.objects.all()
 
         return FollowersCount.objects.filter(pk=pk)
 
@@ -820,6 +808,6 @@ class LikePostViewSet(viewsets.ModelViewSet):
         pk = self.kwargs.get("pk")
 
         if not pk:
-            return LikePost.objects.all()[:3]
+            return LikePost.objects.all()
 
         return LikePost.objects.filter(pk=pk)
