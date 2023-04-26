@@ -74,7 +74,7 @@
                                     {% csrf_token %}
                                     <input type="hidden" value="{{user.username}}" name="follower"/>
                                     <input type="hidden" value="{{user_object.username}}" name="user"/>
-                                    <button type="submit" class="btn {{button_style}}  mt-1">{{button_text}} follow </button>
+                                    <button type="submit" class="btn mt-1">{{button_text}}</button>
                                 </form>
                             </div>
                             {% endif %}

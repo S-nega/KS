@@ -9,6 +9,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, FormView
 from rest_framework import generics, viewsets
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -36,14 +37,10 @@ class MainPage(DataMixin, ListView):
 class UserBooksPage(LoginRequiredMixin, DataMixin, ListView):
     model = Books
     template_name = 'messenger/user_books.html'
-    # user = 'user'
-    # slug_url_kwarg = 'user'
     context_object_name = 'books'
 
     def get_queryset(self):
-        # print(self.kwargs['user'])
         us_id = User.objects.get(username=self.kwargs['user'])
-        # return UserLib.objects.filter(user=self.request.user)
         return Books.objects.filter(user=us_id)
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -57,8 +54,6 @@ class AddBookPage(LoginRequiredMixin, DataMixin, CreateView):
     form_class = AddBookForm
     template_name = 'messenger/addBookPage.html'
     success_url = reverse_lazy('booksPage')
-    # login_url = '/admin/'
-    # login_url = reverse_lazy('login')
     raise_exception = True
 
     def get_context_data(self, *, objects_list=None, **kwargs):
@@ -68,24 +63,21 @@ class AddBookPage(LoginRequiredMixin, DataMixin, CreateView):
         return context
 
 
-# class AddBookToWishList(LoginRequiredMixin, DataMixin, CreateView):
-#     model = WishList
-#     context_object_name = 'links'
-
 
 @login_required(login_url='signin')
 def addToWishList(request):
+
     if request.method == 'POST':
         user = request.POST['user']
         user_id = User.objects.get(username=user)
-        my_user_id = user_id.pk
         book_slug = request.POST['book_slug']
-        print('my_data: ', user, user_id, book_slug)
 
         if WishList.objects.filter(user=user_id, book_slug=book_slug).first():
             delete_wish = WishList.objects.get(user=user_id, book_slug=book_slug)
             delete_wish.delete()
-            return redirect('/main/wishListPage/1' + user)
+            if WishList.objects.filter(user=user_id).count() == 0:
+                return redirect('/main/books/')
+            return redirect('/main/wishListPage/' + user)
         else:
             new_wish = WishList.objects.create(user=user_id, book_slug=book_slug)
             new_wish.save()
@@ -97,9 +89,8 @@ def addToWishList(request):
 class WishListPage(LoginRequiredMixin, DataMixin, ListView):
     model = WishList
     template_name = 'messenger/user_wishList.html'
-    # user = 'user'
-    # slug_url_kwarg = 'user'
     context_object_name = 'wish_list'
+
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -108,7 +99,6 @@ class WishListPage(LoginRequiredMixin, DataMixin, ListView):
         return context
 
     def get_queryset(self):
-        # print(self.kwargs['user'])
         us_id = User.objects.get(username=self.kwargs['user'])
         return WishList.objects.filter(user=us_id)
 
@@ -137,18 +127,19 @@ class ShowBook(DataMixin, DetailView):
     template_name = 'messenger/book.html'
     slug_url_kwarg = 'book_slug'
     context_object_name = 'book'
-    # button_text = 'Добавить в виш-лист'
 
     def get_context_data(self, *, objects_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         c_def = self.get_user_context(title=context['book'])
         context = dict(list(context.items()) + list(c_def.items()))
-        return context
+        if self.request.user.is_authenticated:
+            try:
+                if WishList.objects.get(user=self.request.user, book_slug=context['book'].slug):
+                    context['button_text'] = "Удалить из виш-листа"
+            except WishList.DoesNotExist:
+                context['button_text'] = "Добавить в виш-лист"
 
-    # def get_queryset(self):
-    #     if WishList.objects.get(user=self.request.user, book_slug=self.kwargs['book_slug']):
-    #         button_text = 'Удалить из виш-листа'
-    #     return button_text
+        return context
 
 
 class BooksGenre(DataMixin, ListView):
@@ -162,11 +153,7 @@ class BooksGenre(DataMixin, ListView):
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
-        # c_def = self.get_user_context(title=str(context['books'][0].genre),
-        #                               genre_selected=context['books'][0].genre,
-        #                               author_selected=context['books'][0].author)
         c = Genre.objects.get(slug=self.kwargs['genre_slug'])
-        # a = Author.objects.get(slug=self.kwargs['author_slug'])
         c_def = self.get_user_context(title=str(c.name),
                                       genre_selected=c.pk,)
                                       # author_selected=context['books'][0].author)
@@ -324,16 +311,23 @@ def error500(request):
     return render(request, 'messenger/errors/500.html', status=500)
 
 
+class BookAPIPagination(PageNumberPagination):
+    page_size = 5
+    page_size_query_param = 'page_size'
+    max_page_size = 10000
+
 
 class BookViewSet(viewsets.ModelViewSet):
     # queryset = Books.objects.all()
     serializer_class = BooksSerializer
     permission_classes = (IsAdminOrReadOnly, )
+    pagination_class = BookAPIPagination
     def get_queryset(self):
         pk = self.kwargs.get("pk")
 
         if not pk:
-            return Books.objects.all()[:3]
+            return Books.objects.all()
+            # return Books.objects.all()[:3]
 
         return Books.objects.filter(pk=pk)
 
@@ -350,7 +344,7 @@ class GenreViewSet(viewsets.ModelViewSet):
         pk = self.kwargs.get("pk")
 
         if not pk:
-            return Genre.objects.all()[:3]
+            return Genre.objects.all()
 
         return Genre.objects.filter(pk=pk)
 
@@ -363,7 +357,7 @@ class AuthorViewSet(viewsets.ModelViewSet):
         pk = self.kwargs.get("pk")
 
         if not pk:
-            return Author.objects.all()[:3]
+            return Author.objects.all()
 
         return Author.objects.filter(pk=pk)
 

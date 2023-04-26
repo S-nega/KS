@@ -20,6 +20,7 @@ class DataMixin:
         books_list = cache.get('books_list')
         genres = cache.get('genres')
         cache_menu = cache.get('menu')
+        # button_text = 'Добавить в виш-лист'
         # wish_books = cache.get('wish_books')
         # us_id = User.objects.get(username=self.kwargs['user'])
         # wish_list = WishList.objects.filter(user=us_id)
@@ -48,6 +49,10 @@ class DataMixin:
             books_list = Books.objects.annotate(Count('user'))
             cache.set('books_list', books_list, 60)
 
+        # if kwargs['books_slug']:
+        #     if WishList.objects.get(user=self.request.user, book_slug=kwargs['book_slug']):
+        #         button_text = 'Удалить из виш-листа'
+
         # if not wish_books:
         #     for b in books:
         #         for w in wish_list:
@@ -60,6 +65,7 @@ class DataMixin:
         context['menu'] = cache_menu
         context['genres'] = genres
         context['books_list'] = books_list
+        # context['button_text'] = button_text
         # context['wish_books'] = wish_books
         # context['authors'] = authors
         # context['post'] = post

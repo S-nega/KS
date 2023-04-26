@@ -21,7 +21,7 @@
                 {% csrf_token %}
                 <input type="hidden" value="{{user}}" name="user"/>
                 <input type="hidden" value="{{book.slug}}" name="book_slug"/>
-                <button type="submit" class="btn {{button_style}}  mt-1">{{ button_text }} Добавить в виш-лист/ Remove from wish-list</button>
+                <button type="submit" class="btn mt-1" >{{button_text}}</button>
             </form>
         <br>
 <!--            <a href="#">Добавить в мою библиотеку</a>-->
